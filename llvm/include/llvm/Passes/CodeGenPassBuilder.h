@@ -138,8 +138,7 @@ public:
   }
 
   Error buildPipeline(ModulePassManager &MPM, raw_pwrite_stream &Out,
-                      raw_pwrite_stream *DwoOut,
-                      CodeGenFileType FileType) const;
+                      raw_pwrite_stream *DwoOut, CodeGenFileType FileType);
 
   PassInstrumentationCallbacks *getPassInstrumentationCallbacks() const {
     return PIC;
@@ -400,7 +399,7 @@ protected:
 
   /// Add the complete, standard set of LLVM CodeGen passes.
   /// Fully developed targets will not generally override this.
-  Error addMachinePasses(AddMachinePass &) const;
+  Error addMachinePasses(AddMachinePass &);
 
   /// Add passes to lower exception handling for the code generator.
   void addPassesToHandleExceptions(AddIRPass &) const;
@@ -430,11 +429,11 @@ protected:
 
   /// addFastRegAlloc - Add the minimum set of target-independent passes that
   /// are required for fast register allocation.
-  Error addFastRegAlloc(AddMachinePass &) const;
+  Error addFastRegAlloc(AddMachinePass &);
 
   /// addOptimizedRegAlloc - Add passes related to register allocation.
   /// LLVMTargetMachine provides standard regalloc passes for most targets.
-  void addOptimizedRegAlloc(AddMachinePass &) const;
+  void addOptimizedRegAlloc(AddMachinePass &);
 
   /// Add passes that optimize machine instructions after register allocation.
   void addMachineLateOptimization(AddMachinePass &) const;
@@ -518,7 +517,7 @@ private:
 template <typename Derived, typename TargetMachineT>
 Error CodeGenPassBuilder<Derived, TargetMachineT>::buildPipeline(
     ModulePassManager &MPM, raw_pwrite_stream &Out, raw_pwrite_stream *DwoOut,
-    CodeGenFileType FileType) const {
+    CodeGenFileType FileType) {
   auto StartStopInfo = TargetPassConfig::getStartStopInfo(*PIC);
   if (!StartStopInfo)
     return StartStopInfo.takeError();
@@ -879,7 +878,7 @@ Error CodeGenPassBuilder<Derived, TargetMachineT>::addCoreISelPasses(
 /// instead.
 template <typename Derived, typename TargetMachineT>
 Error CodeGenPassBuilder<Derived, TargetMachineT>::addMachinePasses(
-    AddMachinePass &addPass) const {
+    AddMachinePass &addPass) {
   // Add passes that optimize machine instructions in SSA form.
   if (getOptLevel() != CodeGenOptLevel::None) {
     derived().addMachineSSAOptimization(addPass);
@@ -1086,7 +1085,7 @@ Error CodeGenPassBuilder<Derived, TargetMachineT>::addRegAssignmentOptimized(
 /// register allocation. No coalescing or scheduling.
 template <typename Derived, typename TargetMachineT>
 Error CodeGenPassBuilder<Derived, TargetMachineT>::addFastRegAlloc(
-    AddMachinePass &addPass) const {
+    AddMachinePass &addPass) {
   addPass(PHIEliminationPass());
   addPass(TwoAddressInstructionPass());
   return derived().addRegAssignmentFast(addPass);
@@ -1097,7 +1096,7 @@ Error CodeGenPassBuilder<Derived, TargetMachineT>::addFastRegAlloc(
 /// scheduling, and register allocation itself.
 template <typename Derived, typename TargetMachineT>
 void CodeGenPassBuilder<Derived, TargetMachineT>::addOptimizedRegAlloc(
-    AddMachinePass &addPass) const {
+    AddMachinePass &addPass) {
   addPass(DetectDeadLanesPass());
 
   addPass(InitUndefPass());
