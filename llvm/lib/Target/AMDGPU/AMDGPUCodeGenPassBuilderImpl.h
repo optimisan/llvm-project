@@ -1,4 +1,5 @@
 #include "AMDGPU.h"
+#include "AMDGPUISelDAGToDAG.h"
 #include "AMDGPUTargetMachine.h"
 #include "llvm/CodeGen/AtomicExpand.h"
 #include "llvm/Passes/CodeGenPassBuilder.h"
@@ -102,9 +103,7 @@ template <typename DerivedT, typename TargetMachineT>
 Error AMDGPUCodeGenPassBuilder<DerivedT, TargetMachineT>::addInstSelector(
     typename CodeGenPassBuilder<DerivedT, TargetMachineT>::AddMachinePass
         &addPass) const {
-  addPass(AMDGPUDAGToDAGISelPass(
-      getAMDGPUTargetMachine(),
-      CodeGenPassBuilder<DerivedT, TargetMachineT>::getOptLevel()));
+  addPass(AMDGPUISelDAGToDAGPass(getAMDGPUTargetMachine()));
   return Error::success();
 }
 

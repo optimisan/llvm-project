@@ -484,7 +484,7 @@ void SelectionDAGISel::initializeAnalysisResults(
   if (isAssignmentTrackingEnabled(*Fn.getParent()))
     FnVarLocs = &FAM.getResult<DebugAssignmentTrackingAnalysis>(Fn);
 
-  auto *UA = FAM.getCachedResult<UniformityInfoAnalysis>(Fn);
+  auto *UA = &FAM.getResult<UniformityInfoAnalysis>(Fn);
   MachineModuleInfo &MMI =
       MAMP.getCachedResult<MachineModuleAnalysis>(*Fn.getParent())->getMMI();
 
