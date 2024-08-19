@@ -117,6 +117,7 @@ public:
                                 PerFunctionMIParsingState &PFS,
                                 SMDiagnostic &Error,
                                 SMRange &SourceRange) const override;
+
 };
 
 //===----------------------------------------------------------------------===//
