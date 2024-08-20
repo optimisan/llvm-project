@@ -308,17 +308,16 @@ cl::opt<bool> EnableVOPD("amdgpu-enable-vopd",
                          cl::init(true), cl::Hidden);
 
 // Option is used in lit tests to prevent deadcoding of patterns inspected.
-static cl::opt<bool>
-    EnableDCEInRA("amdgpu-dce-in-ra", cl::init(true), cl::Hidden,
-                  cl::desc("Enable machine DCE inside regalloc"));
+cl::opt<bool> EnableDCEInRA("amdgpu-dce-in-ra", cl::init(true), cl::Hidden,
+                            cl::desc("Enable machine DCE inside regalloc"));
 
-static cl::opt<bool> EnableSetWavePriority("amdgpu-set-wave-priority",
-                                           cl::desc("Adjust wave priority"),
-                                           cl::init(false), cl::Hidden);
+cl::opt<bool> EnableSetWavePriority("amdgpu-set-wave-priority",
+                                    cl::desc("Adjust wave priority"),
+                                    cl::init(false), cl::Hidden);
 
-static cl::opt<bool> EnableScalarIRPasses("amdgpu-scalar-ir-passes",
-                                          cl::desc("Enable scalar IR passes"),
-                                          cl::init(true), cl::Hidden);
+cl::opt<bool> EnableScalarIRPasses("amdgpu-scalar-ir-passes",
+                                   cl::desc("Enable scalar IR passes"),
+                                   cl::init(true), cl::Hidden);
 
 static cl::opt<bool, true> EnableStructurizerWorkarounds(
     "amdgpu-enable-structurizer-workarounds",
@@ -365,11 +364,6 @@ cl::opt<bool>
     EnableHipStdPar("amdgpu-enable-hipstdpar",
                     cl::desc("Enable HIP Standard Parallelism Offload support"),
                     cl::init(false), cl::Hidden);
-
-static cl::opt<bool>
-    EnableAMDGPUAttributor("amdgpu-attributor-enable",
-                           cl::desc("Enable AMDGPUAttributorPass"),
-                           cl::init(true), cl::Hidden);
 
 static cl::opt<bool>
     EnableAMDGPUAttributor("amdgpu-attributor-enable",
@@ -906,13 +900,13 @@ GCNTargetMachine::getTargetTransformInfo(const Function &F) const {
   return TargetTransformInfo(GCNTTIImpl(this, F));
 }
 
-Error GCNTargetMachine::buildCodeGenPipeline(
-    ModulePassManager &MPM, raw_pwrite_stream &Out, raw_pwrite_stream *DwoOut,
-    CodeGenFileType FileType, const CGPassBuilderOption &Opts,
-    PassInstrumentationCallbacks *PIC) {
-  AMDGPUCodeGenPassBuilder CGPB(*this, Opts, PIC);
-  return CGPB.buildPipeline(MPM, Out, DwoOut, FileType);
-}
+// Error GCNTargetMachine::buildCodeGenPipeline(
+//     ModulePassManager &MPM, raw_pwrite_stream &Out, raw_pwrite_stream
+//     *DwoOut, CodeGenFileType FileType, const CGPassBuilderOption &Opts,
+//     PassInstrumentationCallbacks *PIC) {
+//   AMDGPUCodeGenPassBuilder CGPB(*this, Opts, PIC);
+//   return CGPB.buildPipeline(MPM, Out, DwoOut, FileType);
+// }
 
 //===----------------------------------------------------------------------===//
 // AMDGPU Pass Setup

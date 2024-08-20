@@ -11,9 +11,12 @@
 /// TODO: Port CodeGen passes to new pass manager.
 #include "AMDGPUCodeGenPassBuilder.h"
 #include "AMDGPU.h"
+#include "AMDGPUPerfHintAnalysis.h"
 #include "AMDGPUTargetMachine.h"
 #include "AMDGPUUnifyDivergentExitNodes.h"
 #include "R600.h"
+#include "SIFixSGPRCopies.h"
+#include "llvm/Analysis/UniformityAnalysis.h"
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/CodeGen/RegAllocRegistry.h"
 #include "llvm/CodeGen/TargetPassConfig.h"
@@ -32,56 +35,55 @@ using namespace llvm;
 
 // <<<<<<< HEAD
 //
-// void AMDGPUCodeGenPassBuilder::addPreISel(AddIRPass &addPass) const {
-//   const bool LateCFGStructurize =
-//   AMDGPUTargetMachine::EnableLateStructurizeCFG; const bool
-//   DisableStructurizer = AMDGPUTargetMachine::DisableStructurizer; const bool
-//   EnableStructurizerWorkarounds =
-//       AMDGPUTargetMachine::EnableStructurizerWorkarounds;
+void GCNCodeGenPassBuilder::addPreISel(AddIRPass &addPass) const {
+  const bool LateCFGStructurize = AMDGPUTargetMachine::EnableLateStructurizeCFG;
+  const bool DisableStructurizer = AMDGPUTargetMachine::DisableStructurizer;
+  const bool EnableStructurizerWorkarounds =
+      AMDGPUTargetMachine::EnableStructurizerWorkarounds;
 
-//   if (TM.getOptLevel() > CodeGenOptLevel::None)
-//     addPass(FlattenCFGPass());
+  if (getOptLevel() > CodeGenOptLevel::None)
+    addPass(FlattenCFGPass());
 
-//   if (TM.getOptLevel() > CodeGenOptLevel::None)
-//     addPass(SinkingPass());
+  if (getOptLevel() > CodeGenOptLevel::None)
+    addPass(SinkingPass());
 
-//   addPass(AMDGPULateCodeGenPreparePass(TM));
+  addPass(AMDGPULateCodeGenPreparePass(getTargetMachine()));
 
-//   // Merge divergent exit nodes. StructurizeCFG won't recognize the
-//   multi-exit
-//   // regions formed by them.
+  // Merge divergent exit nodes. StructurizeCFG won't recognize the
+  // multi-exit
+  // regions formed by them.
 
-//   addPass(AMDGPUUnifyDivergentExitNodesPass());
+  addPass(AMDGPUUnifyDivergentExitNodesPass());
 
-//   if (!LateCFGStructurize && !DisableStructurizer) {
-//     if (EnableStructurizerWorkarounds) {
-//       addPass(FixIrreduciblePass());
-//       addPass(UnifyLoopExitsPass());
-//     }
+  if (!LateCFGStructurize && !DisableStructurizer) {
+    if (EnableStructurizerWorkarounds) {
+      addPass(FixIrreduciblePass());
+      addPass(UnifyLoopExitsPass());
+    }
 
-//     addPass(StructurizeCFGPass(/*SkipUniformRegions=*/false));
-//   }
+    addPass(StructurizeCFGPass(/*SkipUniformRegions=*/false));
+  }
 
-//   addPass(AMDGPUAnnotateUniformValuesPass());
+  addPass(AMDGPUAnnotateUniformValuesPass());
 
-//   if (!LateCFGStructurize && !DisableStructurizer) {
-//     addPass(SIAnnotateControlFlowPass(TM));
+  if (!LateCFGStructurize && !DisableStructurizer) {
+    addPass(SIAnnotateControlFlowPass(getTargetMachine()));
 
-//     // TODO: Move this right after structurizeCFG to avoid extra divergence
-//     // analysis. This depends on stopping SIAnnotateControlFlow from making
-//     // control flow modifications.
-//     addPass(AMDGPURewriteUndefForPHIPass());
-//   }
+    // TODO: Move this right after structurizeCFG to avoid extra divergence
+    // analysis. This depends on stopping SIAnnotateControlFlow from making
+    // control flow modifications.
+    addPass(AMDGPURewriteUndefForPHIPass());
+  }
 
-//   addPass(LCSSAPass());
+  addPass(LCSSAPass());
 
-//   if (TM.getOptLevel() > CodeGenOptLevel::Less)
-//     addPass(AMDGPUPerfHintAnalysisPass(TM));
+  if (getOptLevel() > CodeGenOptLevel::Less)
+    addPass(AMDGPUPerfHintAnalysisPass(getTargetMachine()));
 
-//   // FIXME: Why isn't this queried as required from AMDGPUISelDAGToDAG, and
-//   why
-//   // isn't this in addInstSelector?
-//   addPass(RequireAnalysisPass<UniformityInfoAnalysis, Function>());
+  // FIXME: Why isn't this queried as required from AMDGPUISelDAGToDAG, and
+  // why isn't this in addInstSelector?
+  addPass(RequireAnalysisPass<UniformityInfoAnalysis, Function>());
+}
 extern cl::opt<bool> EnableEarlyIfConversion;
 
 extern cl::opt<bool> OptExecMaskPreRA;
@@ -415,40 +417,43 @@ void GCNCodeGenPassBuilder::addPreEmitPass(AddMachinePass &addPass) const {
 
   addPass(BranchRelaxationPass());
 }
-void GCNCodeGenPassBuilder::addPreISel(AddIRPass &addPass) const {
-  AMDGPUCodeGenPassBuilder<GCNCodeGenPassBuilder, GCNTargetMachine>::addPreISel(
-      addPass);
+// void GCNCodeGenPassBuilder::addPreISel(AddIRPass &addPass) const {
+//   AMDGPUCodeGenPassBuilder<GCNCodeGenPassBuilder,
+//   GCNTargetMachine>::addPreISel(
+//       addPass);
 
-  if (getOptLevel() > CodeGenOptLevel::None)
-    addPass(AMDGPULateCodeGenPreparePass());
+//   if (getOptLevel() > CodeGenOptLevel::None)
+//     addPass(AMDGPULateCodeGenPreparePass(getTargetMachine()));
 
-  if (getOptLevel() > CodeGenOptLevel::None)
-    addPass(SinkingPass());
+//   if (getOptLevel() > CodeGenOptLevel::None)
+//     addPass(SinkingPass());
 
-  // Merge divergent exit nodes. StructurizeCFG won't recognize the multi-exit
-  // regions formed by them.
-  addPass(AMDGPUUnifyDivergentExitNodesPass());
-  if (!LateCFGStructurize) {
-    if (EnableStructurizerWorkarounds) {
-      addPass(FixIrreduciblePass());
-      addPass(UnifyLoopExitsPass());
-    }
-    addPass(StructurizeCFGPass());
-  }
-  addPass(AMDGPUAnnotateUniformValuesPass());
-  if (!LateCFGStructurize) {
-    addPass(SIAnnotateControlFlowPass());
-    // TODO: Move this right after structurizeCFG to avoid extra divergence
-    // analysis. This depends on stopping SIAnnotateControlFlow from making
-    // control flow modifications.
-    addPass(AMDGPURewriteUndefForPHIPass());
-  }
-  addPass(LCSSAPass());
+//   // Merge divergent exit nodes. StructurizeCFG won't recognize the
+//   multi-exit
+//   // regions formed by them.
+//   addPass(AMDGPUUnifyDivergentExitNodesPass());
+//   if (!LateCFGStructurize) {
+//     if (EnableStructurizerWorkarounds) {
+//       addPass(FixIrreduciblePass());
+//       addPass(UnifyLoopExitsPass());
+//     }
+//     addPass(StructurizeCFGPass());
+//   }
+//   addPass(AMDGPUAnnotateUniformValuesPass());
+//   if (!LateCFGStructurize) {
+//     addPass(SIAnnotateControlFlowPass());
+//     // TODO: Move this right after structurizeCFG to avoid extra divergence
+//     // analysis. This depends on stopping SIAnnotateControlFlow from making
+//     // control flow modifications.
+//     addPass(AMDGPURewriteUndefForPHIPass());
+//   }
+//   addPass(LCSSAPass());
 
-  // FIXME_NEW : Add this CGSCC pass
-  // if (getOptLevel() > CodeGenOptLevel::Less)
-  //   addPass(createModuleToPostOrderCGSCCPassAdaptor(AMDGPUPerfHintAnalysisPass()));
-}
+//   // FIXME_NEW : Add this CGSCC pass
+//   // if (getOptLevel() > CodeGenOptLevel::Less)
+//   //
+//   addPass(createModuleToPostOrderCGSCCPassAdaptor(AMDGPUPerfHintAnalysisPass()));
+// }
 Error GCNTargetMachine::buildCodeGenPipeline(
     ModulePassManager &MPM, raw_pwrite_stream &Out, raw_pwrite_stream *DwoOut,
     CodeGenFileType FileType, const CGPassBuilderOption &Opt,

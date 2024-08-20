@@ -20,11 +20,12 @@
 #endif
 DUMMY_FUNCTION_PASS("amdgpu-annotate-kernel-features-dummy",
                     AMDGPUAnnotateKernelFeaturesPass)
-DUMMY_FUNCTION_PASS("amdgpu-annotate-uniform-values-dummy",
-                    AMDGPUAnnotateUniformValuesPass)
-DUMMY_FUNCTION_PASS("si-annotate-control-flow-dummy", SIAnnotateControlFlowPass)
-DUMMY_FUNCTION_PASS("amdgpu-late-codgen-prepare-dummy",
-                    AMDGPULateCodeGenPreparePass)
+// DUMMY_FUNCTION_PASS("amdgpu-annotate-uniform-values-dummy",
+//                     AMDGPUAnnotateUniformValuesPass)
+// DUMMY_FUNCTION_PASS("si-annotate-control-flow-dummy",
+// SIAnnotateControlFlowPass)
+// DUMMY_FUNCTION_PASS("amdgpu-late-codgen-prepare-dummy",
+//                     AMDGPULateCodeGenPreparePass)
 #undef DUMMY_FUNCTION_PASS
 
 // #ifndef DUMMY_CGSCC_PASS
@@ -72,8 +73,9 @@ DUMMY_MACHINE_FUNCTION_PASS("amdgpu-cfg-structurizer-dummy",
 DUMMY_MACHINE_FUNCTION_PASS("amdgpu-insert-single-use-vtsd-dummy",
                             AMDGPUInsertSingleUseVDSTPass)
 DUMMY_MACHINE_FUNCTION_PASS("si-whole-quad-mode-dummy", SIWholeQuadModePass)
-DUMMY_MACHINE_FUNCTION_PASS("si-fix-sgpr-copies-dummy", SIFixSGPRCopiesPass) //
-DUMMY_MACHINE_FUNCTION_PASS("si-lower-i1-copies-dummy", SILowerI1CopiesPass)
+// DUMMY_MACHINE_FUNCTION_PASS("si-fix-sgpr-copies-dummy", SIFixSGPRCopiesPass)
+// // DUMMY_MACHINE_FUNCTION_PASS("si-lower-i1-copies-dummy",
+// SILowerI1CopiesPass)
 DUMMY_MACHINE_FUNCTION_PASS("si-lower-control-flow-dummy",
                             SILowerControlFlowPass)
 DUMMY_MACHINE_FUNCTION_PASS("amdgpu-pre-ra-long-branch-reg-dummy",

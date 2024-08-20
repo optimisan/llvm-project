@@ -84,6 +84,11 @@ public:
     return CodeGenPassBuilder<DerivedT, TargetMachineT>::template getTM<
         AMDGPUTargetMachine>();
   }
+
+  TargetMachineT &getTargetMachine() const {
+    return CodeGenPassBuilder<DerivedT,
+                              TargetMachineT>::template getTM<TargetMachineT>();
+  }
   void addIRPasses(
       typename CodeGenPassBuilder<DerivedT, TargetMachineT>::AddIRPass &) const;
   void addCodeGenPrepare(
