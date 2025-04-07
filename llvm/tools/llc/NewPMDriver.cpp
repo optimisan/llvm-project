@@ -48,6 +48,40 @@
 
 using namespace llvm;
 
+class RegAllocOptionParser : public cl::parser<RegAllocOption> {
+public:
+  RegAllocOptionParser(cl::Option &O) : cl::parser<RegAllocOption>(O) {}
+  void initialize() {
+    cl::parser<RegAllocOption>::initialize();
+  }
+
+  bool parser(cl::Option &O, StringRef ArgName,
+              StringRef Arg, RegAllocOption &Value) {
+      while (!Arg.empty()) {
+        StringRef ThisOption;
+        std::tie(ThisOption, Arg) = Arg.split(',');
+        if (ThisOption == "default") {
+          Value.Type = RegAllocType::Default;
+        } else if (ThisOption == "pbqp") {
+          Value.Type = RegAllocType::PBQP;
+        } else if (ThisOption == "fast") {
+          Value.Type = RegAllocType::Fast;
+        } else if (ThisOption == "basic") {
+          Value.Type = RegAllocType::Basic;
+        } else if (ThisOption == "greedy") {
+          Value.Type = RegAllocType::Greedy;
+        } else {
+          return O.error("Invalid register allocator type: " + ThisOption);
+        }
+        if (Arg.consume_front("<")) {
+          if (!Arg.consume_back(">"))
+            return O.error("Invalid format for " + ArgName + ": expected '>' after" + Arg);
+        }
+      }
+      return false;
+  }
+};
+
 static cl::opt<RegAllocType, false, RegAllocTypeParser>
     RegAlloc("regalloc-npm",
              cl::desc("Register allocator to use for new pass manager"),

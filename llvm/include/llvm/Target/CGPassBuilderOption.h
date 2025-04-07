@@ -14,6 +14,7 @@
 #ifndef LLVM_TARGET_CGPASSBUILDEROPTION_H
 #define LLVM_TARGET_CGPASSBUILDEROPTION_H
 
+#include "llvm/CodeGen/RegAllocCommon.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Target/TargetOptions.h"
 #include <optional>
@@ -22,6 +23,28 @@ namespace llvm {
 
 enum class RunOutliner { TargetDefault, AlwaysOutline, NeverOutline };
 enum class RegAllocType { Unset, Default, Basic, Fast, Greedy, PBQP };
+
+struct RegAllocOption { 
+  RegAllocType Type = RegAllocType::Unset;
+  std::string FilterName;
+  // RegAllocOption(const )
+  bool operator==(const RegAllocOption &RHS) const {
+    return Type == RHS.Type && FilterName == RHS.FilterName;
+  }
+};
+
+template<>
+struct cl::OptionValue<RegAllocOption> : public cl::OptionValueCopy<RegAllocOption> {
+    using WrapperType = RegAllocOption;
+
+    OptionValue() = default;
+    OptionValue(const RegAllocOption &V) { this->setValue(V); }
+    OptionValue<RegAllocOption> &operator=(const RegAllocOption &V) {
+        this->setValue(V);
+        return *this;
+    }
+};
+
 
 class RegAllocTypeParser : public cl::parser<RegAllocType> {
 public:
@@ -37,6 +60,7 @@ public:
                      "Greedy register allocator");
   }
 };
+
 
 // Not one-on-one but mostly corresponding to commandline options in
 // TargetPassConfig.cpp.

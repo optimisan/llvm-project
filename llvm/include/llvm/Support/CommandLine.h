@@ -858,6 +858,7 @@ public:
 
     for (size_t i = 0, e = Values.size(); i != e; ++i)
       if (Values[i].Name == ArgVal) {
+        llvm::outs() << "Parsing option '" << ArgVal << "'\n";
         V = Values[i].V.getValue();
         return false;
       }
