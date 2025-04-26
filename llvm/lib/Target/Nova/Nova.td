@@ -5,9 +5,13 @@
 include "llvm/Target/Target.td"
 
 include "NovaRegisterInfo.td"
+include "NovaInstrInfo.td"
 
 def : ProcessorModel<"generic", NoSchedModel, []>;
 
+def NovaInstrInfo : InstrInfo {}
+
 def Nova : Target {
+  let InstructionSet = NovaInstrInfo;
 }
 //- create-nova-td

@@ -32,15 +32,18 @@ namespace llvm {
   /// Extended Value Type. Capable of holding value types which are not native
   /// for any processor (such as the i12345 type), as well as the types an MVT
   /// can represent.
+//@s evt-members mark
   struct EVT {
   private:
     MVT V = MVT::INVALID_SIMPLE_VALUE_TYPE;
     Type *LLVMTy = nullptr;
-
+//- evt-members
   public:
     constexpr EVT() = default;
+//@s evt-init-1 mark
     constexpr EVT(MVT::SimpleValueType SVT) : V(SVT) {}
     constexpr EVT(MVT S) : V(S) {}
+//- evt-init-1
 
     bool operator==(EVT VT) const {
       return !(*this != VT);

@@ -505,6 +505,8 @@ getCopyToParts(SelectionDAG &DAG, const SDLoc &DL, SDValue Val, SDValue *Parts,
                unsigned NumParts, MVT PartVT, const Value *V,
                std::optional<CallingConv::ID> CallConv = std::nullopt,
                ISD::NodeType ExtendKind = ISD::ANY_EXTEND) {
+  llvm::outs() << "getCopyToParts()\n";
+  Val.dumpr(&DAG);
   // Let the target split the parts if it wants to
   const TargetLowering &TLI = DAG.getTargetLoweringInfo();
   if (TLI.splitValueIntoRegisterParts(DAG, DL, Val, Parts, NumParts, PartVT,
