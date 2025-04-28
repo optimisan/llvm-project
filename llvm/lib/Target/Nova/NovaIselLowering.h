@@ -45,6 +45,9 @@ public:
       SelectionDAG & /*DAG*/, SmallVectorImpl<SDValue> & /*InVals*/) const override {
         return Chain;
   }
+  /// getTargetNodeName - This method returns the name of a target specific
+  //  DAG node.
+  const char *getTargetNodeName(unsigned Opcode) const override;
 };
 
 } // namespace llvm

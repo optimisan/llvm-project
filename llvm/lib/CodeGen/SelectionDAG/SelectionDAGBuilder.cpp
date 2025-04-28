@@ -2268,6 +2268,7 @@ void SelectionDAGBuilder::visitRet(const ReturnInst &I) {
         unsigned NumParts = TLI.getNumRegistersForCallingConv(Context, CC, VT);
         MVT PartVT = TLI.getRegisterTypeForCallingConv(Context, CC, VT);
         SmallVector<SDValue, 4> Parts(NumParts);
+        assert(NumParts > 0 && "Invalid number of parts!");
         getCopyToParts(DAG, getCurSDLoc(),
                        SDValue(RetOp.getNode(), RetOp.getResNo() + j),
                        &Parts[0], NumParts, PartVT, &I, CC, ExtendKind);
