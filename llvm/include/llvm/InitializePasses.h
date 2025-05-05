@@ -313,7 +313,7 @@ void initializeTargetTransformInfoWrapperPassPass(PassRegistry &);
 void initializeTwoAddressInstructionLegacyPassPass(PassRegistry &);
 void initializeTypeBasedAAWrapperPassPass(PassRegistry &);
 void initializeTypePromotionLegacyPass(PassRegistry &);
-void initializeInitUndefPass(PassRegistry &);
+void initializeInitUndefLegacyPass(PassRegistry &);
 void initializeUniformityInfoWrapperPassPass(PassRegistry &);
 void initializeUnifyLoopExitsLegacyPassPass(PassRegistry &);
 void initializeUnpackMachineBundlesPass(PassRegistry &);
