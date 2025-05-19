@@ -137,15 +137,15 @@ namespace llvm {
           ApproxFuncFPMath(false), EnableAIXExtendedAltivecABI(false),
           HonorSignDependentRoundingFPMathOption(false), NoZerosInBSS(false),
           GuaranteedTailCallOpt(false), StackSymbolOrdering(true),
-          EnableFastISel(false), EnableGlobalISel(false), UseInitArray(false),
-          DisableIntegratedAS(false), FunctionSections(false),
-          DataSections(false), IgnoreXCOFFVisibility(false),
-          XCOFFTracebackTable(true), UniqueSectionNames(true),
-          UniqueBasicBlockSectionNames(false), SeparateNamedSections(false),
-          TrapUnreachable(false), NoTrapAfterNoreturn(false), TLSSize(0),
-          EmulatedTLS(false), EnableTLSDESC(false), EnableIPRA(false),
-          EmitStackSizeSection(false), EnableMachineOutliner(false),
-          EnableMachineFunctionSplitter(false),
+          EnableFastISel(false), EnableGlobalISel(false), EnableNewPM(false),
+          UseInitArray(false), DisableIntegratedAS(false),
+          FunctionSections(false), DataSections(false),
+          IgnoreXCOFFVisibility(false), XCOFFTracebackTable(true),
+          UniqueSectionNames(true), UniqueBasicBlockSectionNames(false),
+          SeparateNamedSections(false), TrapUnreachable(false),
+          NoTrapAfterNoreturn(false), TLSSize(0), EmulatedTLS(false),
+          EnableTLSDESC(false), EnableIPRA(false), EmitStackSizeSection(false),
+          EnableMachineOutliner(false), EnableMachineFunctionSplitter(false),
           EnableStaticDataPartitioning(false), SupportsDefaultOutlining(false),
           EmitAddrsig(false), BBAddrMap(false), EmitCallSiteInfo(false),
           SupportsDebugEntryValues(false), EnableDebugEntryValues(false),
@@ -247,6 +247,8 @@ namespace llvm {
 
     /// EnableGlobalISel - This flag enables global instruction selection.
     unsigned EnableGlobalISel : 1;
+
+    unsigned EnableNewPM : 1;
 
     /// EnableGlobalISelAbort - Control abort behaviour when global instruction
     /// selection fails to lower/select an instruction.
