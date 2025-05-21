@@ -205,11 +205,7 @@ void AMDGPUAsmPrinter::emitFunctionBodyStart() {
   }
 
   if (STM.isAmdHsaOS())
-{ 
-  llvm::dbgs() << "Before calling emitKernel, ProgramInfo.ScratchSize: "
-               << CurrentProgramInfo.ScratchSize << "\n";
     HSAMetadataStream->emitKernel(*MF, CurrentProgramInfo);
-}
 }
 
 void AMDGPUAsmPrinter::emitFunctionBodyEnd() {
@@ -650,15 +646,15 @@ void AMDGPUAsmPrinter::run(MachineFunction &MF, MachineFunctionAnalysisManager &
 }
 
 bool AMDGPUAsmPrinter::runOnMachineFunction(MachineFunction &MF) {
-  llvm::dbgs() << "AMDGPUAsmPrinter::runOnMachineFunction: " << MF.getName()
-               << "\n";
   // Init target streamer lazily on the first function so that previous passes
   // can set metadata.
   if (!IsTargetStreamerInitialized)
     initTargetStreamer(*MF.getFunction().getParent());
 
   if (!inNewPassManager())
-    ResourceUsage = &getAnalysis<AMDGPUResourceUsageAnalysis>();
+    ResourceUsage = &getAnalysis<AMDGPUResourceUsageWrapperLegacy>().getInfo();
+  else
+    ResourceUsage = &MFAM->getResult<AMDGPUResourceUsageAnalysis>(MF);
   CurrentProgramInfo.reset(MF);
 
   const AMDGPUMachineFunction *MFI = MF.getInfo<AMDGPUMachineFunction>();
@@ -680,7 +676,7 @@ bool AMDGPUAsmPrinter::runOnMachineFunction(MachineFunction &MF) {
     OutStreamer->switchSection(ConfigSection);
   }
 
-  const AMDGPUResourceUsageAnalysis::SIFunctionResourceInfo &Info =
+  const AMDGPUResourceUsageInfo::SIFunctionResourceInfo &Info =
       ResourceUsage->getResourceInfo();
   RI.gatherResourceInfo(MF, Info, OutContext);
 
@@ -1683,8 +1679,8 @@ bool AMDGPUAsmPrinter::PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
 }
 
 void AMDGPUAsmPrinter::getAnalysisUsage(AnalysisUsage &AU) const {
-  AU.addRequired<AMDGPUResourceUsageAnalysis>();
-  AU.addPreserved<AMDGPUResourceUsageAnalysis>();
+  AU.addRequired<AMDGPUResourceUsageWrapperLegacy>();
+  AU.addPreserved<AMDGPUResourceUsageWrapperLegacy>();
   AU.addRequired<MachineModuleInfoWrapperPass>();
   AU.addPreserved<MachineModuleInfoWrapperPass>();
   AsmPrinter::getAnalysisUsage(AU);
