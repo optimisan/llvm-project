@@ -90,6 +90,7 @@
 #include "llvm/InitializePasses.h"
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Passes/PassBuilder.h"
+#include "llvm/Support/CodeGen.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Transforms/HipStdPar/HipStdPar.h"
 #include "llvm/Transforms/IPO.h"
@@ -1054,7 +1055,8 @@ GCNTargetMachine::GCNTargetMachine(const Target &T, const Triple &TT,
                                    CodeGenOptLevel OL, bool JIT)
     : AMDGPUTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL) {
   if (getSelectorType(*this) != InstructionSelectionType::GlobalISel)
-    this->Options.EnableNewPM = true;
+    if (OL > CodeGenOptLevel::None)
+      this->Options.EnableNewPM = true;
 }
 
 const TargetSubtargetInfo *
@@ -2288,10 +2290,10 @@ void AMDGPUCodeGenPassBuilder::addPreEmitPass(AddMachinePass &addPass) const {
   addPass(SIMemoryLegalizerPass());
   addPass(SIInsertWaitcntsPass());
 
-  // TODO: addPass(SIModeRegisterPass());
+  addPass(SIModeRegisterPass());
 
   if (TM.getOptLevel() > CodeGenOptLevel::None) {
-    // TODO: addPass(SIInsertHardClausesPass());
+    addPass(SIInsertHardClausesPass());
   }
 
   addPass(SILateBranchLoweringPass());
